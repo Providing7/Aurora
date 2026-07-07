@@ -1,0 +1,114 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.3'
+    id 'io.spring.dependency-management' version '1.1.6'
+    id 'org.flywaydb.flyway' version '10.8.1'
+}
+
+group = 'br.gov.recife.conecta'
+version = '1.0.0-SNAPSHOT'
+sourceCompatibility = '21'
+targetCompatibility = '21'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencyManagement {
+    imports {
+        mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2023.0.3'
+    }
+}
+
+dependencies {
+    // Spring Boot Web & Core
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+
+    // Virtual Threads (Project Loom) - Java 21
+    // (Already enabled via spring-boot-starter-web and application.yml)
+
+    // JWT & OAuth2
+    implementation 'org.springframework.security:spring-security-oauth2-resource-server'
+    implementation 'org.springframework.security:spring-security-oauth2-jose'
+    implementation 'com.auth0:java-jwt:4.4.0'
+
+    // PostgreSQL & PostGIS
+    runtimeOnly 'org.postgresql:postgresql:42.7.3'
+    implementation 'org.hibernate.orm:hibernate-spatial:6.4.4.Final'
+    implementation 'org.locationtech.jts:jts-core:1.19.0'
+
+    // Database Migrations
+    implementation 'org.flywaydb:flyway-core:10.8.1'
+    implementation 'org.flywaydb:flyway-database-postgresql:10.8.1'
+
+    // Kafka & Messaging
+    implementation 'org.springframework.cloud:spring-cloud-stream'
+    implementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka'
+    implementation 'org.apache.kafka:kafka-clients:3.7.0'
+    implementation 'org.springframework.kafka:spring-kafka'
+
+    // Cryptography & Security
+    implementation 'org.springframework.security:spring-security-crypto'
+
+    // Resilience4j
+    implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.2.0'
+    implementation 'io.github.resilience4j:resilience4j-circuitbreaker:2.2.0'
+    implementation 'io.github.resilience4j:resilience4j-retry:2.2.0'
+    implementation 'io.github.resilience4j:resilience4j-timelimiter:2.2.0'
+    implementation 'io.github.resilience4j:resilience4j-micrometer:2.2.0'
+
+    // Rate Limiting
+    implementation 'com.github.vladimir-bukhtoyarov:bucket4j-core:7.6.0'
+
+    // Observability & Monitoring (Micrometer + OpenTelemetry)
+    implementation 'io.micrometer:micrometer-core'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+    implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
+    implementation 'io.opentelemetry.instrumentation:opentelemetry-instrumentation-api:2.4.0'
+
+    // Logging & Observability
+    implementation 'org.springframework.boot:spring-boot-starter-logging'
+    implementation 'net.logstash.logback:logstash-logback-encoder:8.0'
+
+    // Configuration Management
+    implementation 'org.springframework.cloud:spring-cloud-config-client'
+
+    // WebClient for resilient HTTP calls
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    // Lombok (optional, for reducing boilerplate)
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.testcontainers:testcontainers:1.20.0'
+    testImplementation 'org.testcontainers:postgresql:1.20.0'
+    testImplementation 'org.testcontainers:kafka:1.20.0'
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs << '--enable-preview'
+    options.compilerArgs << '-parameters'
+}
+
+tasks.withType(Test) {
+    jvmArgs = ['--enable-preview']
+}
+
+bootRun {
+    jvmArgs = ['--enable-preview', '-XX:+UseG1GC', '-XX:+UseContainerSupport', '-XX:MaxRAMPercentage=75.0']
+}
