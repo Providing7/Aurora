@@ -1,0 +1,70 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.4'
+    id 'io.spring.dependency-management' version '1.1.6'
+}
+
+group = 'br.recife.conecta'
+version = '1.0.0'
+sourceCompatibility = '21'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    //Spring boot base
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    //PostgreSQL + PostGIS (geoprocessamento)
+    runtimeOnly 'org.postgresql:postgresql:42.7.3'
+    implementation 'org.hibernate.orm:hibernate-spatial:6.4.Final'
+    implementation 'org.locationtech.jts:jts-core:1.19.0'
+    implementation 'org.locationtech.jts:jts-io:1.19.0'
+
+    //Kafka consumer (consome denuncia.criada)
+    implementation 'org.springframework.kafka:spring-kafka'
+
+
+    //Geoespacial e cartografia
+    implementation 'org.geotools:gt-main:31.2'
+    implementation 'org.geotools:gt-shapefile:31.2'
+    implementation 'org.geotools:gt-epsg-hsql:31.2'
+
+    //Cache para mapas de calor (performance)
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'io.lettuce:lettuce-core'
+
+    //Processamento assíncrono
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    //Flyway migrations
+    implementation 'org.flywaydb:flyway-core:10.8.1'
+    implementation 'org.flywaydb:flyway-database-postgresql:10.8.1'
+
+    //Observability
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    implementation 'net.logstash.logback:logstash-logback-encoder:8.0' 
+    implementation 'io.telemetry:opentelemetry-exporter-trace-otlp'
+
+    //Segurança JWT (valida tokens do API Gateway)
+    implementation 'org.springframework.security:spring-security-crypto'
+    implementation 'com.auth0:java-jwt:4.4.0'
+
+    //JSON mapping
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jts:2.16.0'
+
+    //Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.testcontainers:testcontainers:1.20.0'
+    testImplementation 'org.testcontainers:postgresql:1.20.0'
+    testImplementation 'org.testcontainers:kafka:1.20.0'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
